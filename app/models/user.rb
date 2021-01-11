@@ -12,7 +12,7 @@ class User < ApplicationRecord
 
   validates :email, :username, presence: true
   validates :email, :username, uniqueness: true
-  validates :email, format: { with: EMAIL_REGEXP }
+  validates :email, format: { with: REGEXP_EMAIL }
   validates :username, length: { maximum: 40 }
   validates :username, format: { with: REGEXP_USERNAME }
   validates :password, presence: true, on: :create
