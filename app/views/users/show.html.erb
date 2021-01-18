@@ -11,6 +11,11 @@
     @<%= @user.username %>
   </h2>
 
+  <h4>
+    <%= @questions.size %>
+    <%= inclination(@questions.size, 'вопрос', 'вопроса', 'вопросов') %>
+  </h4>
+
   <div class="user-ask-button container text-center">
     <%= link_to "Спроси меня", '', class: 'button button-light', id: 'ask-button' %>
   </div>
