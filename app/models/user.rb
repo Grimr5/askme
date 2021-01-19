@@ -26,7 +26,7 @@ class User < ApplicationRecord
   end
 
   def self.authenticate(email, password)
-    user = find_by(email: email)
+    user = find_by(email: email&.downcase!)
 
     if user.present? && user.password_hash == User.hash_to_string(OpenSSL::PKCS5.pbkdf2_hmac(password, user.password_salt, ITERATIONS, DIGEST.length, DIGEST))
       user
@@ -38,8 +38,8 @@ class User < ApplicationRecord
   private
 
   def downcase_username_and_email
-    username.downcase! if username.present?
-    email.downcase! if email.present?
+    username&.downcase!
+    email&.downcase!
   end
 
   def encrypt_password
