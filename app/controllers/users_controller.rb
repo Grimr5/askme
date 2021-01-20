@@ -1,38 +1,56 @@
 class UsersController < ApplicationController
+  before_action :load_user, except: [:index, :create, :new]
+  before_action :authorize_user, except: [:index, :new, :create, :show]
+
   def index
-    @users = [
-      User.new(
-        id: 1,
-        name: 'Sergei',
-        username: 'grimreaper',
-        avatar_url: 'https://whatsism.com/uploads/posts/2018-07/1530546770_rmk_vdjbx10.jpg'
-      ),
-      User.new(
-        id: 2,
-        name: 'Misha',
-        username: 'aristofun'
-      )
-    ]
+    @users = User.all
   end
 
   def new
+    redirect_to root_url, alert:  'Вы уже залогинены' if current_user.present?
+    @user = User.new
   end
 
-  def edit
+  def create
+    redirect_to root_url, alert: 'Вы уже залогинены' if current_user.present?
+
+    @user = User.new(user_params)
+
+    if @user.save
+      redirect_to root_url, notice: 'Пользователь успешно зарегистрирован!'
+    else
+      render 'new'
+    end
+  end
+
+  def edit; end
+
+  def update
+    if @user.update(user_params)
+      redirect_to user_path(@user), notice: 'Данные обновлены'
+    else
+      render 'edit'
+    end
   end
 
   def show
-    @user = User.new(
-      name: 'Sergey',
-      username: 'grimreaper',
-      avatar_url: 'https://whatsism.com/uploads/posts/2018-07/1530546770_rmk_vdjbx10.jpg'
-    )
+    @questions = @user.questions.order(created_at: :desc)
 
-    @questions = [
-      Question.new(text: 'Как дела', created_at: Date.parse('15.01.2021')),
-      Question.new(text: 'В чем смысл жизни?', created_at: Date.parse('15.01.2021'))
-    ]
+    @new_question = @user.questions.build
+  end
 
-    @new_question = Question.new
+  private
+
+  def authorize_user
+    reject_user unless @user == current_user
+  end
+
+  def load_user
+    @user ||= User.find params[:id]
+  end
+
+  def user_params
+    params.require(:user).permit(:email, :password, :password_confirmation,
+                                 :name, :username, :avatar_url)
   end
 end
